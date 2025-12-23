@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: scheduling.TiredThreadTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 2.018 s <<< FAILURE! -- in scheduling.TiredThreadTest
+scheduling.TiredThreadTest.testRunExecutesTaskAndShutdown -- Time elapsed: 2.009 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Assigned task should have been executed by the worker ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:210)
+	at scheduling.TiredThreadTest.testRunExecutesTaskAndShutdown(TiredThreadTest.java:48)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
