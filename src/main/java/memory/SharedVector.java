@@ -9,58 +9,154 @@ public class SharedVector {
     private ReadWriteLock lock = new java.util.concurrent.locks.ReentrantReadWriteLock();
 
     public SharedVector(double[] vector, VectorOrientation orientation) {
-        // TODO: store vector data and its orientation
+        this.vector = vector;
+        this.orientation = orientation;
     }
 
     public double get(int index) {
-        // TODO: return element at index (read-locked)
-        return 0;
+        readLock()
+        try{
+            return vector[index];
+        } finally {
+            readUnlock()
+        }
     }
 
     public int length() {
-        // TODO: return vector length
-        return 0;
+        return this.vector.length;
     }
 
     public VectorOrientation getOrientation() {
-        // TODO: return vector orientation
-        return null;
+        return this.orientation;
     }
 
     public void writeLock() {
-        // TODO: acquire write lock
+        lock.writeLock().lock();
     }
 
     public void writeUnlock() {
-        // TODO: release write lock
+        lock.writeUnlock().lock();
     }
 
     public void readLock() {
-        // TODO: acquire read lock
+        lock.readLock().lock();
     }
 
     public void readUnlock() {
-        // TODO: release read lock
+        lock.readUnlock().lock();
     }
 
     public void transpose() {
-        // TODO: transpose vector
+        writeLock();
+        try{
+            if (this.orientation == VectorOrientation.ROW_MAJOR){
+                this.orientation = VectorOrientation.COLUMN_MAJOR;
+            }
+            else if (this.orientation == VectorOrientation.COLUMN_MAJOR) {
+                this.orientation = VectorOrientation.ROW_MAJOR;
+            }
+        } finally {
+            writeUnlock();
+        }
     }
 
     public void add(SharedVector other) {
-        // TODO: add two vectors
+        if (this.orientation != other.orientation) {
+            throw new IllegalArgumentException("Cannot add vectors with different orientations");
+        }
+        if (this.length() != other.length()) {
+            throw new IllegalArgumentException("Vectors must have the same length");
+        }
+
+        writeLock();
+        other.readLock();
+        try{
+            for(i = 0; i < this.length; i++){
+                this.vector[i] += other.get(i);
+            }
+        } finally {
+            writeUnlock();
+            other.readUnlock();
+        }
     }
 
     public void negate() {
-        // TODO: negate vector
+        writeLock();
+        try{
+            for (i = 0; i < this.length(); i++){
+                this.vector[i] = this.vector[i]*(-1);
+            }
+        } finally {
+            writeUnlock();
+        }
     }
 
     public double dot(SharedVector other) {
-        // TODO: compute dot product (row · column)
-        return 0;
+        if (other == null) {
+        throw new IllegalArgumentException("Other vector cannot be null");
+        }
+        if (this.length() != other.length()) {
+            throw new IllegalArgumentException("Vectors must have the same length");
+        }
+        if (this.orientation == other.orientation) {
+            throw new IllegalArgumentException("Dot product requires one row vector and one column vector");
+        }
+
+        readLock();
+        other.readLock();
+        try{
+            double sum = 0.0;
+            for (i = 0; i < this.length(); i++){
+                sum += this.vector[i] * other.get(i);
+            }
+            return sum;
+        } finally {
+            other.readUnlock();
+            readUnlock();
+        }
     }
 
     public void vecMatMul(SharedMatrix matrix) {
-        // TODO: compute row-vector × matrix
+        if (matrix == null) {
+            throw new IllegalArgumentException("Matrix cannot be null");
+        }
+        if (this.orientation != VectorOrientation.ROW_MAJOR) {
+            throw new IllegalArgumentException("Vector must be a row vector for vecMatMul");
+        }
+
+        VectorOrientation matOrien = matrix.getOrientation();
+        int matRows = (matOrien == VectorOrientation.ROW_MAJOR) ? matrix.length() : matrix.get(0).length();
+        int matCols = (matOrien == VectorOrientation.ROW_MAJOR) ? matrix.get(0).length() : matrix.length();
+        if (this.length() != matRows){
+            throw new IllegalArgumentException("Vector length must match number of matrix rows");
+        }
+
+        double[] res = new double[matCols];
+        matrix.readLock();
+        writeLock();
+        try {
+            if (matOrien == VectorOrientation.ROW_MAJOR){
+                for (int j = 0; j < cols; j++) {
+                double sum = 0.0;
+                for (int i = 0; i < rows; i++) {
+                    sum += this.vector[i] * matrix.get(i).get(j);
+                }
+                res[j] = sum;
+                }
+            } else {
+                for (int j = 0; j < cols; j++) {
+                double sum = 0.0;
+                SharedVector col = matrix.get(j); // column j
+                for (int i = 0; i < rows; i++) {
+                    sum += this.vector[i] * col.get(i);
+                }
+                result[j] = sum;
+                }
+            }
+            this.vector = res;
+        } finally {
+            writeUnlock();
+            matrix.readUnlock();
+        }
     }
 }
