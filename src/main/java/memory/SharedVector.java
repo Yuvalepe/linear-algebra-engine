@@ -14,11 +14,11 @@ public class SharedVector {
     }
 
     public double get(int index) {
-        readLock()
-        try{
+        readLock();
+        try {
             return vector[index];
         } finally {
-            readUnlock()
+            readUnlock();
         }
     }
 
@@ -35,7 +35,7 @@ public class SharedVector {
     }
 
     public void writeUnlock() {
-        lock.writeUnlock().lock();
+        lock.writeLock().unlock();
     }
 
     public void readLock() {
@@ -43,7 +43,7 @@ public class SharedVector {
     }
 
     public void readUnlock() {
-        lock.readUnlock().lock();
+        lock.readLock().unlock();
     }
 
     public void transpose() {
@@ -65,13 +65,13 @@ public class SharedVector {
             throw new IllegalArgumentException("Cannot add vectors with different orientations");
         }
         if (this.length() != other.length()) {
-            throw new IllegalArgumentException("Vectors must have the same length");
+            throw new IndexOutOfBoundsException("Vectors must have the same length");
         }
 
         writeLock();
         other.readLock();
-        try{
-            for(i = 0; i < this.length; i++){
+        try {
+            for (int i = 0; i < this.length(); i++) {
                 this.vector[i] += other.get(i);
             }
         } finally {
@@ -82,9 +82,9 @@ public class SharedVector {
 
     public void negate() {
         writeLock();
-        try{
-            for (i = 0; i < this.length(); i++){
-                this.vector[i] = this.vector[i]*(-1);
+        try {
+            for (int i = 0; i < this.length(); i++) {
+                this.vector[i] = -this.vector[i];
             }
         } finally {
             writeUnlock();
@@ -104,9 +104,9 @@ public class SharedVector {
 
         readLock();
         other.readLock();
-        try{
+        try {
             double sum = 0.0;
-            for (i = 0; i < this.length(); i++){
+            for (int i = 0; i < this.length(); i++) {
                 sum += this.vector[i] * other.get(i);
             }
             return sum;
@@ -132,31 +132,31 @@ public class SharedVector {
         }
 
         double[] res = new double[matCols];
-        matrix.readLock();
+        readLock();
         writeLock();
         try {
-            if (matOrien == VectorOrientation.ROW_MAJOR){
-                for (int j = 0; j < cols; j++) {
-                double sum = 0.0;
-                for (int i = 0; i < rows; i++) {
-                    sum += this.vector[i] * matrix.get(i).get(j);
-                }
-                res[j] = sum;
+            if (matOrien == VectorOrientation.ROW_MAJOR) {
+                for (int j = 0; j < matCols; j++) {
+                    double sum = 0.0;
+                    for (int i = 0; i < matRows; i++) {
+                        sum += this.vector[i] * matrix.get(i).get(j);
+                    }
+                    res[j] = sum;
                 }
             } else {
-                for (int j = 0; j < cols; j++) {
-                double sum = 0.0;
-                SharedVector col = matrix.get(j); // column j
-                for (int i = 0; i < rows; i++) {
-                    sum += this.vector[i] * col.get(i);
-                }
-                result[j] = sum;
+                for (int j = 0; j < matCols; j++) {
+                    double sum = 0.0;
+                    SharedVector col = matrix.get(j); // column j
+                    for (int i = 0; i < matRows; i++) {
+                        sum += this.vector[i] * col.get(i);
+                    }
+                    res[j] = sum;
                 }
             }
             this.vector = res;
         } finally {
             writeUnlock();
-            matrix.readUnlock();
+            readUnlock();
         }
     }
 }
