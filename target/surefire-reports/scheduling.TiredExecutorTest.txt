@@ -1,16 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: scheduling.TiredExecutorTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.015 s <<< FAILURE! -- in scheduling.TiredExecutorTest
-scheduling.TiredExecutorTest.testSubmitAllWaitsForCompletion -- Time elapsed: 0.012 s <<< FAILURE!
-org.opentest4j.AssertionFailedError: All tasks should have finished after submitAll returns ==> expected: <10> but was: <0>
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
-	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
-	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
-	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
-	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:559)
-	at scheduling.TiredExecutorTest.testSubmitAllWaitsForCompletion(TiredExecutorTest.java:31)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
-
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.251 s -- in scheduling.TiredExecutorTest

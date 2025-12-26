@@ -41,8 +41,8 @@ public class SharedMatrix {
         double[][] result = new double[vectors.length][];
 
         for (int i = 0; i < vectors.length; i++) {
+            result[i] = new double[vectors[i].length()];
             for (int j = 0; j < vectors[i].length(); j++) {
-                result[i] = new double[vectors[i].length()];
                 result[i][j] = vectors[i].get(j);
             }
         }
