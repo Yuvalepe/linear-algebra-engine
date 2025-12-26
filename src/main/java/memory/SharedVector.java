@@ -146,7 +146,7 @@ public class SharedVector {
             } else {
                 for (int j = 0; j < matCols; j++) {
                     double sum = 0.0;
-                    SharedVector col = matrix.get(j); // column j
+                    SharedVector col = matrix.get(j);
                     for (int i = 0; i < matRows; i++) {
                         sum += this.vector[i] * col.get(i);
                     }

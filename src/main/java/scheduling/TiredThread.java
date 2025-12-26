@@ -56,7 +56,10 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * it throws IllegalStateException.
      */
     public void newTask(Runnable task) {
-       // TODO
+        if (task == null) 
+            throw new NullPointerException("Task cannot be null");
+
+        handoff.add(task);
     }
 
     /**
@@ -64,17 +67,55 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * Inserts a poison pill so the worker wakes up and exits.
      */
     public void shutdown() {
-       // TODO
+       alive.set(false);
+       try {
+           handoff.put(POISON_PILL);
+       } catch (InterruptedException e) {
+           Thread.currentThread().interrupt();
+       }
     }
 
     @Override
     public void run() {
-       // TODO
+        try {
+            while(alive.get()){
+                Runnable task = handoff.take();
+
+                // Calculate idle time
+                long now = System.nanoTime();
+                long idleDuration = now - idleStartTime.get();
+                timeIdle.addAndGet(idleDuration);
+
+                if(task == POISON_PILL) {
+                    break;
+                }
+
+                busy.set(true);
+                long startTime = System.nanoTime();
+                
+                try {
+                    task.run();
+                }
+                catch (Exception e) {
+                    System.err.println("Worker " + id + " encountered an error: " + e.getMessage());
+                }
+                finally {
+                    long endTime = System.nanoTime();
+                    long usedDuration = endTime - startTime;
+                    timeUsed.addAndGet(usedDuration);
+
+                    busy.set(false);
+                    idleStartTime.set(System.nanoTime());
+                }
+            }
+        }
+        catch (InterruptedException e) {
+           Thread.currentThread().interrupt();
+        }
     }
 
     @Override
     public int compareTo(TiredThread o) {
-        // TODO
-        return 0;
+        return Double.compare(this.getFatigue(), o.getFatigue());
     }
 }
