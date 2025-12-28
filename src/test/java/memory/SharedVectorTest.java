@@ -24,7 +24,6 @@ class SharedVectorTest {
         SharedVector v1 = new SharedVector(new double[]{1.0}, VectorOrientation.ROW_MAJOR);
         SharedVector v2 = new SharedVector(new double[]{1.0, 2.0}, VectorOrientation.ROW_MAJOR);
 
-        // Depending on your implementation, this should throw an exception or handle gracefully
         assertThrows(IndexOutOfBoundsException.class, () -> v1.add(v2), "Should throw exception for mismatched sizes");
     }
 
@@ -44,7 +43,31 @@ class SharedVectorTest {
         assertEquals(VectorOrientation.COLUMN_MAJOR, v.getOrientation());
     }
 
-    // Helper to avoid calling .get(i) repeatedly in assertions
+    @Test
+    void testVecMatMul() {
+        double[] vecData = {1.0, 2.0, 3.0};
+        SharedVector v = new SharedVector(vecData, VectorOrientation.ROW_MAJOR);
+
+        SharedMatrix mat = new SharedMatrix(new double[][]{
+            {4.0, 5.0},
+            {6.0, 7.0},
+            {8.0, 9.0}
+        });
+
+        v.vecMatMul(mat); 
+
+        assertArrayEquals(new double[]{40.0, 46.0}, extractData(v), 0.0001);
+    }
+
+    @Test
+    void testTranspose() {
+        SharedVector v = new SharedVector(new double[]{1, 2}, VectorOrientation.ROW_MAJOR);
+        v.transpose();
+        assertEquals(VectorOrientation.COLUMN_MAJOR, v.getOrientation());
+        v.transpose();
+        assertEquals(VectorOrientation.ROW_MAJOR, v.getOrientation());
+    }
+
     private double[] extractData(SharedVector v) {
         double[] res = new double[v.length()];
         for(int i=0; i<v.length(); i++) res[i] = v.get(i);

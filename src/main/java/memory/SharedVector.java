@@ -132,7 +132,6 @@ public class SharedVector {
         }
 
         double[] res = new double[matCols];
-        readLock();
         writeLock();
         try {
             if (matOrien == VectorOrientation.ROW_MAJOR) {
@@ -156,7 +155,6 @@ public class SharedVector {
             this.vector = res;
         } finally {
             writeUnlock();
-            readUnlock();
         }
     }
 }

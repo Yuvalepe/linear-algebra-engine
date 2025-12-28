@@ -51,4 +51,24 @@ class TiredThreadTest {
         t.join(2000);
         assertTrue(!t.isAlive(), "Worker thread should terminate after shutdown");
     }
+    @Test
+    void testWorkerSurvivesException() throws Exception {
+        TiredThread t = new TiredThread(0, 1.0);
+        t.start();
+        
+        AtomicBoolean secondTaskRan = new AtomicBoolean(false);
+
+        t.newTask(() -> { throw new RuntimeException("Crashed"); });
+
+        t.newTask(() -> secondTaskRan.set(true));
+
+        long deadline = System.currentTimeMillis() + 1000;
+        while (!secondTaskRan.get() && System.currentTimeMillis() < deadline) {
+            Thread.sleep(10);
+        }
+        assertTrue(secondTaskRan.get(), "Worker should survive a crashed task");
+        
+        t.shutdown();
+        t.join();
+    }
 }

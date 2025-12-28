@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="maven-antrun-" default="main">
+  <target name="main">
+    <copy file="C:\Users\USER\Desktop\Coding\SPL\Linear Algebra Engine\target/lga-1.0.jar" tofile="C:\Users\USER\Desktop\Coding\SPL\Linear Algebra Engine/lga-1.0.jar" />
+  </target>
+</project>

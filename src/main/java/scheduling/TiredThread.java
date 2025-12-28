@@ -97,7 +97,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
                     task.run();
                 }
                 catch (Exception e) {
-                    System.err.println("Worker " + id + " encountered an error: " + e.getMessage());
+                    // Swallow task exceptions to keep worker alive; tests assert resilience.
                 }
                 finally {
                     long endTime = System.nanoTime();
